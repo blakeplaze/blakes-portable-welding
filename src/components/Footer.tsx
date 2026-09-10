@@ -48,7 +48,7 @@ export function Footer() {
         <GoogleReviews compact />
       </div>
       <div className="mb-8 flex justify-center gap-6">
-        <a href="mailto:blakesportablewelding@gmail.com" className="hover:text-foreground">
+        <a href="mailto:info@bpweld.com" className="hover:text-foreground">
           Email
         </a>
         <a

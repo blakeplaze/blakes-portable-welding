@@ -11,7 +11,7 @@ export default function PrivacyPage() {
         address, email, phone number, and project details you submit on the
         estimate form so we can respond to your request. We do not sell that
         information. You may receive marketing and promotional materials related
-        to our welding services. Contact blakesportablewelding@gmail.com to ask questions
+        to our welding services. Contact info@bpweld.com to ask questions
         about this policy.
       </p>
     </div>

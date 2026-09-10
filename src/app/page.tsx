@@ -63,8 +63,8 @@ export default function HomePage() {
           </a>
           <br />
           Email:{" "}
-          <a href="mailto:blakesportablewelding@gmail.com" className="underline">
-            blakesportablewelding@gmail.com
+          <a href="mailto:info@bpweld.com" className="underline">
+            info@bpweld.com
           </a>
         </p>
         <p className="mt-6 text-sm leading-7">
@@ -92,10 +92,10 @@ export default function HomePage() {
       </section>
 
       <section className="mx-auto max-w-xl px-5 pb-8 text-center">
-        <p className="text-sm tracking-[0.14em] uppercase text-muted">
+        <h2 className="text-2xl font-normal">Accepted Payment Methods</h2>
+        <p className="mt-3 text-sm tracking-[0.14em] uppercase text-muted">
           Cash or Credit/Debit Card
         </p>
-        <h2 className="mt-3 text-2xl font-normal">Accepted Payment Methods</h2>
       </section>
 
       <section id="about" className="mx-auto max-w-2xl px-5 pb-20 text-center">
