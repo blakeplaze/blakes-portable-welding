@@ -5,11 +5,104 @@ import { Turnstile, turnstileEnabled } from "@/components/Turnstile";
 
 const services = ["Mobile Welding", "Aluminum", "Steel", "Stainless", "Other Exotic"];
 const MAX_PHOTOS = 4;
+const FORM_SUBMIT_AJAX = "https://formsubmit.co/ajax/blakesportablewelding@gmail.com";
+const FORM_SUBMIT = "https://formsubmit.co/blakesportablewelding@gmail.com";
 const FALLBACK_ERROR = "Could not send the request. Please try again or call 313-512-9353.";
 
 function safeError(message?: string) {
   if (!message || /<!DOCTYPE|<html|Just a moment/i.test(message)) return FALLBACK_ERROR;
   return message;
+}
+
+function isHtml(value: string) {
+  return /<!DOCTYPE|<html|Just a moment/i.test(value);
+}
+
+function formSubmitFields(payload: FormData) {
+  const outbound = new FormData();
+  outbound.set("name", String(payload.get("name") || ""));
+  outbound.set("address", String(payload.get("address") || ""));
+  outbound.set("email", String(payload.get("email") || ""));
+  outbound.set("phone", String(payload.get("phone") || ""));
+  outbound.set("services", String(payload.get("services") || "None selected"));
+  outbound.set("details", String(payload.get("details") || ""));
+  outbound.set("_replyto", String(payload.get("email") || ""));
+  outbound.set("_subject", `Estimate request from ${String(payload.get("name") || "").trim()}`);
+  outbound.set("_template", "table");
+  outbound.set("_captcha", "false");
+  payload.getAll("photos").forEach((photo, index) => {
+    if (photo instanceof File && photo.size > 0) {
+      outbound.set(`photo_${index + 1}`, photo, photo.name || `photo-${index + 1}.jpg`);
+    }
+  });
+  return outbound;
+}
+
+function postFormSubmitInBrowser(payload: FormData, returnId: string) {
+  const form = document.createElement("form");
+  form.method = "POST";
+  form.action = FORM_SUBMIT;
+  form.enctype = "multipart/form-data";
+  form.style.display = "none";
+
+  const outbound = formSubmitFields(payload);
+  outbound.set(
+    "_next",
+    `${window.location.origin}${window.location.pathname}?sent=${encodeURIComponent(returnId)}`,
+  );
+
+  outbound.forEach((value, name) => {
+    if (value instanceof File) {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.name = name;
+      const transfer = new DataTransfer();
+      transfer.items.add(value);
+      input.files = transfer.files;
+      form.appendChild(input);
+      return;
+    }
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  });
+
+  document.body.appendChild(form);
+  form.submit();
+}
+
+async function sendToFormSubmit(payload: FormData, returnId: string) {
+  const outbound = formSubmitFields(payload);
+  let response: Response;
+  let text: string;
+  try {
+    response = await fetch(FORM_SUBMIT_AJAX, {
+      method: "POST",
+      body: outbound,
+      headers: { Accept: "application/json" },
+    });
+    text = await response.text();
+  } catch {
+    postFormSubmitInBrowser(payload, returnId);
+    return "redirect";
+  }
+  if (isHtml(text)) {
+    postFormSubmitInBrowser(payload, returnId);
+    return "redirect";
+  }
+  let result: { success?: boolean | string; message?: string };
+  try {
+    result = JSON.parse(text) as { success?: boolean | string; message?: string };
+  } catch {
+    postFormSubmitInBrowser(payload, returnId);
+    return "redirect";
+  }
+  if (!response.ok || result.success === false || result.success === "false") {
+    throw new Error(safeError(result.message));
+  }
+  return "sent";
 }
 
 async function compressPhoto(file: File) {
@@ -47,6 +140,19 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
     return () => urls.forEach((url) => URL.revokeObjectURL(url));
   }, [photos]);
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("sent") !== id) return;
+    setStatus("sent");
+    params.delete("sent");
+    const query = params.toString();
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}${query ? `?${query}` : ""}${window.location.hash}`,
+    );
+  }, [id]);
+
   async function onPhotos(fileList: FileList | null) {
     const next = [...photos];
     for (const file of Array.from(fileList || [])) {
@@ -75,11 +181,38 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
     payload.set("turnstile", turnstileToken);
     photos.forEach((photo) => payload.append("photos", photo));
 
+    if (String(payload.get("company_website") || "").trim()) {
+      form.reset();
+      setPhotos([]);
+      setStatus("sent");
+      return;
+    }
+
+    const check = new FormData();
+    [
+      "name",
+      "address",
+      "email",
+      "phone",
+      "details",
+      "services",
+      "company_website",
+      "startedAt",
+      "turnstile",
+    ].forEach((key) => check.set(key, String(payload.get(key) || "")));
+
     try {
-      const response = await fetch("/api/estimate", { method: "POST", body: payload });
-      const result = (await response.json().catch(() => ({}))) as { error?: string };
+      const response = await fetch("/api/estimate", { method: "POST", body: check });
+      const result = (await response.json().catch(() => ({}))) as {
+        error?: string;
+        skip?: boolean;
+      };
       if (!response.ok) {
         throw new Error(safeError(result.error));
+      }
+      if (!result.skip) {
+        const outcome = await sendToFormSubmit(payload, id);
+        if (outcome === "redirect") return;
       }
       form.reset();
       setPhotos([]);
