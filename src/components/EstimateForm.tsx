@@ -6,16 +6,25 @@ import { Turnstile, turnstileEnabled } from "@/components/Turnstile";
 const services = ["Mobile Welding", "Aluminum", "Steel", "Stainless", "Other Exotic"];
 const MAX_PHOTOS = 4;
 const FORM_SUBMIT_AJAX = "https://formsubmit.co/ajax/blakesportablewelding@gmail.com";
-const FORM_SUBMIT = "https://formsubmit.co/blakesportablewelding@gmail.com";
 const FALLBACK_ERROR = "Could not send the request. Please try again or call 313-512-9353.";
+const ACTIVATION_ERROR =
+  "The shop inbox still needs a one-time FormSubmit confirmation. Open the latest email from FormSubmit in blakesportablewelding@gmail.com, click Activate Form, then submit again.";
 
 function safeError(message?: string) {
-  if (!message || /<!DOCTYPE|<html|Just a moment/i.test(message)) return FALLBACK_ERROR;
+  if (!message || /<!DOCTYPE|<html|Just a moment|needs Activation|Activate Form/i.test(message)) {
+    return FALLBACK_ERROR;
+  }
   return message;
 }
 
 function isHtml(value: string) {
   return /<!DOCTYPE|<html|Just a moment/i.test(value);
+}
+
+function isActivationResponse(text: string, message?: string) {
+  return /needs Activation|Activate Form|Check Your Email|we've sent you an email/i.test(
+    `${text} ${message || ""}`,
+  );
 }
 
 function formSubmitFields(payload: FormData) {
@@ -42,43 +51,7 @@ function formSubmitFields(payload: FormData) {
   return outbound;
 }
 
-function postFormSubmitInBrowser(payload: FormData, returnId: string) {
-  const form = document.createElement("form");
-  form.method = "POST";
-  form.action = FORM_SUBMIT;
-  form.enctype = "multipart/form-data";
-  form.style.position = "absolute";
-  form.style.left = "-9999px";
-
-  const outbound = formSubmitFields(payload);
-  outbound.set(
-    "_next",
-    `${window.location.origin}${window.location.pathname}?sent=${encodeURIComponent(returnId)}`,
-  );
-
-  outbound.forEach((value, name) => {
-    if (value instanceof File) {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.name = name;
-      const transfer = new DataTransfer();
-      transfer.items.add(value);
-      input.files = transfer.files;
-      form.appendChild(input);
-      return;
-    }
-    const input = document.createElement("input");
-    input.type = "hidden";
-    input.name = name;
-    input.value = value;
-    form.appendChild(input);
-  });
-
-  document.body.appendChild(form);
-  form.submit();
-}
-
-async function sendToFormSubmit(payload: FormData, returnId: string) {
+async function sendToFormSubmit(payload: FormData) {
   const outbound = formSubmitFields(payload);
   let response: Response;
   let text: string;
@@ -90,24 +63,26 @@ async function sendToFormSubmit(payload: FormData, returnId: string) {
     });
     text = await response.text();
   } catch {
-    postFormSubmitInBrowser(payload, returnId);
-    return "redirect";
+    throw new Error(FALLBACK_ERROR);
+  }
+  if (isActivationResponse(text)) {
+    throw new Error(ACTIVATION_ERROR);
   }
   if (isHtml(text)) {
-    postFormSubmitInBrowser(payload, returnId);
-    return "redirect";
+    throw new Error(FALLBACK_ERROR);
   }
   let result: { success?: boolean | string; message?: string };
   try {
     result = JSON.parse(text) as { success?: boolean | string; message?: string };
   } catch {
-    postFormSubmitInBrowser(payload, returnId);
-    return "redirect";
+    throw new Error(FALLBACK_ERROR);
+  }
+  if (isActivationResponse(text, result.message)) {
+    throw new Error(ACTIVATION_ERROR);
   }
   if (!response.ok || result.success === false || result.success === "false") {
     throw new Error(safeError(result.message));
   }
-  return "sent";
 }
 
 async function compressPhoto(file: File) {
@@ -222,15 +197,7 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
         throw new Error(safeError(result.error));
       }
       if (!result.skip) {
-        const hasPhotos = payload
-          .getAll("photos")
-          .some((item) => item instanceof File && item.size > 0);
-        if (hasPhotos) {
-          postFormSubmitInBrowser(payload, id);
-          return;
-        }
-        const outcome = await sendToFormSubmit(payload, id);
-        if (outcome === "redirect") return;
+        await sendToFormSubmit(payload);
       }
       form.reset();
       setPhotos([]);

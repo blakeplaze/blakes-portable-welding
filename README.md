@@ -13,7 +13,7 @@ npm run dev
 
 Open http://localhost:3000
 
-Estimate requests go through FormSubmit to `blakesportablewelding@gmail.com`, including optional photos. The first live submit may ask that inbox to confirm email delivery.
+Estimate requests stay on the site and go through FormSubmit’s AJAX endpoint to `blakesportablewelding@gmail.com`, including optional photos. The first live submit may ask that inbox to confirm email delivery.
 
 ## Spam protection
 
