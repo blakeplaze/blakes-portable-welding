@@ -7,7 +7,6 @@ const links = [
     label: "Procore Network",
     external: true,
   },
-  { href: "/#services", label: "List Of Services" },
   { href: "/portfolio", label: "Welding Portfolio" },
   {
     href: "https://medium.com/@theweldersedge",

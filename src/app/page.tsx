@@ -97,15 +97,6 @@ export default function HomePage() {
         <h2 className="mt-3 text-2xl font-normal">Accepted Payment Methods</h2>
       </section>
 
-      <section id="services" className="mx-auto max-w-2xl px-5 py-12 text-center">
-        <h2 className="text-2xl font-normal">List Of Services</h2>
-        <p className="mt-6 text-sm leading-7 text-muted">
-          Mobile welding and cutting on site: aluminum, steel, stainless, and other
-          exotic metals. Construction and maintenance repairs, plus specialized
-          jobs that others might avoid.
-        </p>
-      </section>
-
       <section id="about" className="mx-auto max-w-2xl px-5 pb-20 text-center">
         <h2 className="text-2xl font-normal">About Us</h2>
         <p className="mt-6 text-sm leading-7 text-muted">
