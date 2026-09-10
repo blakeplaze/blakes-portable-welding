@@ -13,4 +13,4 @@ npm run dev
 
 Open http://localhost:3000
 
-Estimate requests open an email to `Estimates@Bpweld.com`.
+Estimate requests go to `Estimates@Bpweld.com`, including optional photos. The first live submit may ask that inbox to confirm email delivery.
