@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 import { clientIp, tooManyRequests } from "@/lib/rate-limit";
 
 const TO = "blakesportablewelding@gmail.com";
@@ -7,6 +8,14 @@ const MAX_BYTES = 5 * 1024 * 1024;
 
 function linkCount(text: string) {
   return (text.match(/https?:\/\/|www\./gi) || []).length;
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
 async function verifyTurnstile(token: string, ip: string) {
@@ -104,31 +113,66 @@ export async function POST(request: Request) {
     }
   }
 
-  const outbound = new FormData();
-  outbound.set("name", name);
-  outbound.set("email", email);
-  outbound.set("phone", phone);
-  outbound.set("address", address);
-  outbound.set("services", services || "None selected");
-  outbound.set("details", details);
-  outbound.set("_replyto", email);
-  outbound.set("_subject", `Estimate request from ${name}`);
-  outbound.set("_template", "table");
-  outbound.set("_captcha", "false");
-  photos.forEach((photo, index) => {
-    outbound.set(`photo_${index + 1}`, photo, photo.name || `photo-${index + 1}.jpg`);
-  });
-
-  const response = await fetch(`https://formsubmit.co/ajax/${TO}`, {
-    method: "POST",
-    body: outbound,
-    headers: { Accept: "application/json" },
-  });
-
-  if (!response.ok) {
-    const message = await response.text();
+  const user = process.env.GMAIL_USER || TO;
+  const pass = process.env.GMAIL_APP_PASSWORD;
+  if (!pass) {
     return NextResponse.json(
-      { error: message || "Could not send the estimate request." },
+      { error: "Estimate email is not set up yet. Please call 313-512-9353." },
+      { status: 503 },
+    );
+  }
+
+  const attachments = await Promise.all(
+    photos.map(async (photo, index) => ({
+      filename: photo.name || `photo-${index + 1}.jpg`,
+      content: Buffer.from(await photo.arrayBuffer()),
+      contentType: photo.type || "image/jpeg",
+    })),
+  );
+
+  const text = [
+    `Name: ${name}`,
+    `Address: ${address}`,
+    `Email: ${email}`,
+    `Phone: ${phone}`,
+    `Services: ${services || "None selected"}`,
+    "",
+    "Details:",
+    details || "(none)",
+  ].join("\n");
+
+  const html = `
+    <h2>Estimate request</h2>
+    <table>
+      <tr><td><strong>Name</strong></td><td>${escapeHtml(name)}</td></tr>
+      <tr><td><strong>Address</strong></td><td>${escapeHtml(address)}</td></tr>
+      <tr><td><strong>Email</strong></td><td>${escapeHtml(email)}</td></tr>
+      <tr><td><strong>Phone</strong></td><td>${escapeHtml(phone)}</td></tr>
+      <tr><td><strong>Services</strong></td><td>${escapeHtml(services || "None selected")}</td></tr>
+    </table>
+    <p><strong>Details</strong></p>
+    <p>${escapeHtml(details || "(none)").replace(/\n/g, "<br>")}</p>
+  `;
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user, pass },
+    });
+
+    await transporter.sendMail({
+      from: `"Blake's Portable Welding" <${user}>`,
+      to: TO,
+      replyTo: email,
+      subject: `Estimate request from ${name}`,
+      text,
+      html,
+      attachments,
+    });
+  } catch (err) {
+    console.error("Estimate email failed", err);
+    return NextResponse.json(
+      { error: "Could not send the estimate request. Please try again or call 313-512-9353." },
       { status: 502 },
     );
   }

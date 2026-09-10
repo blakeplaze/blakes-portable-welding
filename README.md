@@ -13,7 +13,16 @@ npm run dev
 
 Open http://localhost:3000
 
-Estimate requests go to `blakesportablewelding@gmail.com`, including optional photos. The first live submit may ask that inbox to confirm email delivery.
+Estimate requests go to `blakesportablewelding@gmail.com`, including optional photos.
+
+Gmail blocks regular passwords from websites, so the form uses a Google App Password:
+
+1. Turn on 2-Step Verification for `blakesportablewelding@gmail.com`.
+2. Create an app password at https://myaccount.google.com/apppasswords
+3. In Netlify → Site configuration → Environment variables, set:
+   - `GMAIL_USER` = `blakesportablewelding@gmail.com`
+   - `GMAIL_APP_PASSWORD` = the 16-character app password (no spaces)
+4. Redeploy so the keys take effect.
 
 ## Spam protection
 

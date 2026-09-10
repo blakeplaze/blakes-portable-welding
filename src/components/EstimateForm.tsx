@@ -5,6 +5,12 @@ import { Turnstile, turnstileEnabled } from "@/components/Turnstile";
 
 const services = ["Mobile Welding", "Aluminum", "Steel", "Stainless", "Other Exotic"];
 const MAX_PHOTOS = 4;
+const FALLBACK_ERROR = "Could not send the request. Please try again or call 313-512-9353.";
+
+function safeError(message?: string) {
+  if (!message || /<!DOCTYPE|<html|Just a moment/i.test(message)) return FALLBACK_ERROR;
+  return message;
+}
 
 async function compressPhoto(file: File) {
   try {
@@ -71,16 +77,16 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
 
     try {
       const response = await fetch("/api/estimate", { method: "POST", body: payload });
-      const result = (await response.json()) as { error?: string };
+      const result = (await response.json().catch(() => ({}))) as { error?: string };
       if (!response.ok) {
-        throw new Error(result.error || "Could not send the request.");
+        throw new Error(safeError(result.error));
       }
       form.reset();
       setPhotos([]);
       setStatus("sent");
     } catch (err) {
       setStatus("error");
-      setError(err instanceof Error ? err.message : "Could not send the request.");
+      setError(safeError(err instanceof Error ? err.message : ""));
     }
   }
 
