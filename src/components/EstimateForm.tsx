@@ -32,7 +32,11 @@ function formSubmitFields(payload: FormData) {
   outbound.set("_captcha", "false");
   payload.getAll("photos").forEach((photo, index) => {
     if (photo instanceof File && photo.size > 0) {
-      outbound.set(`photo_${index + 1}`, photo, photo.name || `photo-${index + 1}.jpg`);
+      outbound.set(
+        index === 0 ? "attachment" : `attachment${index + 1}`,
+        photo,
+        photo.name || `photo-${index + 1}.jpg`,
+      );
     }
   });
   return outbound;
@@ -43,7 +47,8 @@ function postFormSubmitInBrowser(payload: FormData, returnId: string) {
   form.method = "POST";
   form.action = FORM_SUBMIT;
   form.enctype = "multipart/form-data";
-  form.style.display = "none";
+  form.style.position = "absolute";
+  form.style.left = "-9999px";
 
   const outbound = formSubmitFields(payload);
   outbound.set(
@@ -211,6 +216,13 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
         throw new Error(safeError(result.error));
       }
       if (!result.skip) {
+        const hasPhotos = payload
+          .getAll("photos")
+          .some((item) => item instanceof File && item.size > 0);
+        if (hasPhotos) {
+          postFormSubmitInBrowser(payload, id);
+          return;
+        }
         const outcome = await sendToFormSubmit(payload, id);
         if (outcome === "redirect") return;
       }
