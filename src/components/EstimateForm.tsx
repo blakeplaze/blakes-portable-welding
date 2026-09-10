@@ -79,18 +79,6 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
             </label>
           ))}
         </fieldset>
-        <p className="pt-2 text-xs leading-5 text-muted">
-          You may receive marketing and promotional materials. Contact the merchant
-          for their privacy practices.{" "}
-          <a href="/privacy" className="underline">
-            Privacy Policy
-          </a>{" "}
-          and{" "}
-          <a href="/terms" className="underline">
-            Terms of Service
-          </a>
-          .
-        </p>
         <button type="submit" className="btn mt-2 w-full">
           Submit
         </button>
