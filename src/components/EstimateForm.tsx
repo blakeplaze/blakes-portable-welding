@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { Turnstile, turnstileEnabled } from "@/components/Turnstile";
 
 const services = ["Mobile Welding", "Aluminum", "Steel", "Stainless", "Other Exotic"];
 const MAX_PHOTOS = 4;
@@ -31,6 +32,8 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
   const [error, setError] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [startedAt] = useState(() => Date.now());
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   useEffect(() => {
     const urls = photos.map((photo) => URL.createObjectURL(photo));
@@ -61,6 +64,9 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
     payload.set("phone", String(data.get("phone") || ""));
     payload.set("details", String(data.get("details") || ""));
     payload.set("services", chosen.join(", "));
+    payload.set("company_website", String(data.get("company_website") || ""));
+    payload.set("startedAt", String(startedAt));
+    payload.set("turnstile", turnstileToken);
     photos.forEach((photo) => payload.append("photos", photo));
 
     try {
@@ -81,7 +87,18 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
   return (
     <section id={id} className="mx-auto w-full max-w-md px-5 py-8">
       <h2 className="mb-6 text-center text-2xl font-normal">Estimate Request</h2>
-      <form onSubmit={onSubmit} className="space-y-3">
+      <form onSubmit={onSubmit} className="relative space-y-3">
+        <div className="hp" aria-hidden="true">
+          <label>
+            Company website
+            <input
+              type="text"
+              name="company_website"
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </label>
+        </div>
         <input
           required
           name="name"
@@ -162,7 +179,12 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
             </label>
           ))}
         </fieldset>
-        <button type="submit" className="btn mt-2 w-full" disabled={status === "sending"}>
+        <Turnstile onToken={setTurnstileToken} />
+        <button
+          type="submit"
+          className="btn mt-2 w-full"
+          disabled={status === "sending" || (turnstileEnabled && !turnstileToken)}
+        >
           {status === "sending" ? "Sending..." : "Submit"}
         </button>
         {status === "sent" ? (
