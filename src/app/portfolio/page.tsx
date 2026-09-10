@@ -9,8 +9,7 @@ export default function PortfolioPage() {
     <div className="mx-auto max-w-2xl px-5 py-12 text-center">
       <h1 className="text-3xl font-normal">Welding Portfolio</h1>
       <p className="mt-6 text-sm leading-7 text-muted">
-        Job photos live on Instagram. The Square site embeds that feed here; this
-        copy links straight to the same account.
+        Recent job photos are on Instagram @BlakesPortableWelding.
       </p>
       <a
         href="https://www.instagram.com/BlakesPortableWelding"
