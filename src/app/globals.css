@@ -62,3 +62,21 @@ textarea {
   cursor: not-allowed;
   opacity: 0.55;
 }
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #111;
+  border-radius: 8px;
+  background: #fff;
+  color: #111;
+  padding: 0.8rem 1.4rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background: #111;
+  color: #fff;
+}

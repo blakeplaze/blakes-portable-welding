@@ -118,19 +118,22 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
           className="field resize-y"
           placeholder="Provide any further details you think may be helpful to us."
         />
-        <label className="block text-left text-sm">
-          Attach a photo (optional). You can add up to 4. Tap a thumbnail to remove it.
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            className="mt-2 block w-full text-sm"
-            onChange={(event) => {
-              void onPhotos(event.target.files);
-              event.target.value = "";
-            }}
-          />
-        </label>
+        <div className="text-left text-sm">
+          <p>Attach a photo (optional). You can add up to 4. Tap a thumbnail to remove it.</p>
+          <label className="btn-outline mt-3 w-full">
+            {photos.length ? "Add more photos" : "Choose photos"}
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              className="sr-only"
+              onChange={(event) => {
+                void onPhotos(event.target.files);
+                event.target.value = "";
+              }}
+            />
+          </label>
+        </div>
         {previews.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {previews.map((src, index) => (
