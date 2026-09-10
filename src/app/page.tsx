@@ -92,7 +92,7 @@ export default function HomePage() {
 
       <section className="mx-auto max-w-xl px-5 pb-8 text-center">
         <p className="text-sm tracking-[0.14em] uppercase text-muted">
-          Cash, Credit/Debit Card or Business Checks
+          Cash or Credit/Debit Card
         </p>
         <h2 className="mt-3 text-2xl font-normal">Accepted Payment Methods</h2>
       </section>

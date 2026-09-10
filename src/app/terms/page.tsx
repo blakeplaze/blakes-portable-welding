@@ -9,8 +9,8 @@ export default function TermsPage() {
       <p className="mt-6 text-muted">
         Estimate requests submitted through this site are inquiries, not a
         contract. Work, pricing, and scheduling are confirmed directly with Blake
-        Fife Welding, LLC. Payment is accepted as cash, credit/debit card, or
-        business check. Licensed and insured mobile welding serving Metro Detroit
+        Fife Welding, LLC. Payment is accepted as cash or credit/debit card.
+        Licensed and insured mobile welding serving Metro Detroit
         since 2012.
       </p>
     </div>
