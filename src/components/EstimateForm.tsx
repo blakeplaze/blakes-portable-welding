@@ -6,6 +6,7 @@ import { Turnstile, turnstileEnabled } from "@/components/Turnstile";
 const services = ["Mobile Welding", "Aluminum", "Steel", "Stainless", "Other Exotic"];
 const MAX_PHOTOS = 4;
 const FORM_SUBMIT_AJAX = "https://formsubmit.co/ajax/blakesportablewelding@gmail.com";
+const FORM_SUBMIT = "https://formsubmit.co/blakesportablewelding@gmail.com";
 const FALLBACK_ERROR = "Could not send the request. Please try again or call 313-512-9353.";
 const ACTIVATION_ERROR =
   "The shop inbox still needs a one-time FormSubmit confirmation. Open the latest email from FormSubmit in blakesportablewelding@gmail.com, click Activate Form, then submit again.";
@@ -49,6 +50,86 @@ function formSubmitFields(payload: FormData) {
     }
   });
   return outbound;
+}
+
+function hasPhotos(payload: FormData) {
+  return payload.getAll("photos").some((item) => item instanceof File && item.size > 0);
+}
+
+function appendFormSubmitFields(form: HTMLFormElement, payload: FormData, next: string) {
+  const outbound = formSubmitFields(payload);
+  outbound.set("_next", next);
+  outbound.forEach((value, name) => {
+    if (value instanceof File) {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.name = name;
+      const transfer = new DataTransfer();
+      transfer.items.add(value);
+      input.files = transfer.files;
+      form.appendChild(input);
+      return;
+    }
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = value;
+    form.appendChild(input);
+  });
+}
+
+function sendPhotosThroughFormSubmit(payload: FormData) {
+  return new Promise<void>((resolve, reject) => {
+    const iframeName = `estimate-send-${Date.now()}`;
+    const iframe = document.createElement("iframe");
+    iframe.name = iframeName;
+    iframe.title = "Sending estimate";
+    iframe.setAttribute("aria-hidden", "true");
+    iframe.style.cssText = "position:absolute;width:0;height:0;border:0;visibility:hidden";
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = FORM_SUBMIT;
+    form.enctype = "multipart/form-data";
+    form.target = iframeName;
+    form.style.display = "none";
+    appendFormSubmitFields(form, payload, `${window.location.origin}/estimate-received`);
+
+    let settled = false;
+    const cleanup = () => {
+      iframe.remove();
+      form.remove();
+    };
+    const finish = (error?: Error) => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timer);
+      cleanup();
+      if (error) reject(error);
+      else resolve();
+    };
+
+    iframe.addEventListener("load", () => {
+      try {
+        const href = iframe.contentWindow?.location.href ?? "";
+        if (!href || href === "about:blank") return;
+        if (href.startsWith(window.location.origin)) {
+          finish();
+          return;
+        }
+      } catch {
+        finish(new Error(ACTIVATION_ERROR));
+      }
+    });
+
+    const timer = window.setTimeout(() => {
+      finish(new Error(ACTIVATION_ERROR));
+    }, 15000);
+
+    document.body.appendChild(iframe);
+    document.body.appendChild(form);
+    form.submit();
+  });
 }
 
 async function sendToFormSubmit(payload: FormData) {
@@ -197,7 +278,11 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
         throw new Error(safeError(result.error));
       }
       if (!result.skip) {
-        await sendToFormSubmit(payload);
+        if (hasPhotos(payload)) {
+          await sendPhotosThroughFormSubmit(payload);
+        } else {
+          await sendToFormSubmit(payload);
+        }
       }
       form.reset();
       setPhotos([]);
