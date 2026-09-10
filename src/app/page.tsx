@@ -62,8 +62,8 @@ export default function HomePage() {
           </a>
           <br />
           Email:{" "}
-          <a href="mailto:Estimates@Bpweld.com" className="underline">
-            Estimates@Bpweld.com
+          <a href="mailto:blakesportablewelding@gmail.com" className="underline">
+            blakesportablewelding@gmail.com
           </a>
         </p>
         <p className="mt-6 text-sm leading-7">

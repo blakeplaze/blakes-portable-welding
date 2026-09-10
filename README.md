@@ -13,7 +13,7 @@ npm run dev
 
 Open http://localhost:3000
 
-Estimate requests go to `Estimates@Bpweld.com`, including optional photos. The first live submit may ask that inbox to confirm email delivery.
+Estimate requests go to `blakesportablewelding@gmail.com`, including optional photos. The first live submit may ask that inbox to confirm email delivery.
 
 ## Spam protection
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { clientIp, tooManyRequests } from "@/lib/rate-limit";
 
-const TO = "Estimates@Bpweld.com";
+const TO = "blakesportablewelding@gmail.com";
 const MAX_FILES = 4;
 const MAX_BYTES = 5 * 1024 * 1024;
 
