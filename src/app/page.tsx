@@ -127,9 +127,9 @@ function Quotes({
       {quotes.map((item) => (
         <blockquote key={item.name}>
           <p className="text-[1.05rem] leading-7">&ldquo;{item.quote}&rdquo;</p>
-          <footer className="mt-4 text-sm tracking-wide text-muted uppercase">
+          <p className="mt-4 text-sm tracking-wide text-muted uppercase">
             {item.name}
-          </footer>
+          </p>
         </blockquote>
       ))}
     </section>

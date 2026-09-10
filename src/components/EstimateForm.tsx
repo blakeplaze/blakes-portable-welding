@@ -136,14 +136,20 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
   const [error, setError] = useState("");
   const [photos, setPhotos] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
-  const [startedAt] = useState(() => Date.now());
+  const [startedAt, setStartedAt] = useState<number | null>(null);
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const urls = photos.map((photo) => URL.createObjectURL(photo));
     setPreviews(urls);
     return () => urls.forEach((url) => URL.revokeObjectURL(url));
   }, [photos]);
+
+  useEffect(() => {
+    setReady(true);
+    setStartedAt(Date.now());
+  }, []);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -182,7 +188,7 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
     payload.set("details", String(data.get("details") || ""));
     payload.set("services", chosen.join(", "));
     payload.set("company_website", String(data.get("company_website") || ""));
-    payload.set("startedAt", String(startedAt));
+    payload.set("startedAt", String(startedAt ?? Date.now()));
     payload.set("turnstile", turnstileToken);
     photos.forEach((photo) => payload.append("photos", photo));
 
@@ -236,9 +242,21 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
   }
 
   return (
-    <section id={id} className="mx-auto w-full max-w-md px-5 py-8">
-      <h2 className="mb-6 text-center text-2xl font-normal">Estimate Request</h2>
-      <form onSubmit={onSubmit} className="relative space-y-3">
+    <section id={id} className="mx-auto w-full max-w-md px-5 py-8" suppressHydrationWarning>
+      <h2 className="mb-6 text-center text-2xl font-normal" suppressHydrationWarning>
+        Estimate Request
+      </h2>
+      {!ready ? (
+        <div className="space-y-3" aria-hidden="true" suppressHydrationWarning>
+          <div className="field min-h-12" />
+          <div className="field min-h-12" />
+          <div className="field min-h-12" />
+          <div className="field min-h-12" />
+          <div className="field min-h-28" />
+          <div className="btn mt-2 h-12 w-full" />
+        </div>
+      ) : (
+      <form onSubmit={onSubmit} className="relative space-y-3" suppressHydrationWarning>
         <div className="hp" aria-hidden="true">
           <label>
             Company website
@@ -247,44 +265,55 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
               name="company_website"
               tabIndex={-1}
               autoComplete="off"
+              suppressHydrationWarning
             />
           </label>
         </div>
         <input
           required
           name="name"
+          autoComplete="name"
           className="field"
           placeholder="Name or Company Name *"
           aria-label="Name or Company Name (required)"
+          suppressHydrationWarning
         />
         <input
           required
           name="address"
+          autoComplete="street-address"
           className="field"
           placeholder="Address For Service *"
           aria-label="Address For Service (required)"
+          suppressHydrationWarning
         />
         <input
           required
           type="email"
           name="email"
+          autoComplete="email"
           className="field"
           placeholder="Email *"
           aria-label="Email (required)"
+          suppressHydrationWarning
         />
         <input
           required
           type="tel"
           name="phone"
+          autoComplete="tel"
           className="field"
           placeholder="Phone *"
           aria-label="Phone (required)"
+          suppressHydrationWarning
         />
         <textarea
           name="details"
           rows={4}
+          autoComplete="off"
           className="field resize-y"
           placeholder="Provide any further details you think may be helpful to us."
+          suppressHydrationWarning
         />
         <div className="text-left text-sm">
           <p>Attach a photo (optional). You can add up to 4. Tap a thumbnail to remove it.</p>
@@ -371,6 +400,7 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
           <p className="text-center text-sm text-red-700">{error}</p>
         ) : null}
       </form>
+      )}
     </section>
   );
 }

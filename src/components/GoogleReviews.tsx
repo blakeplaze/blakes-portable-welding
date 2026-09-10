@@ -55,8 +55,10 @@ export function GoogleReviews({ compact = false }: { compact?: boolean }) {
         className="mt-5 inline-flex flex-col items-center"
       >
         <Stars />
-        <p className="mt-3 text-3xl font-normal">{rating.toFixed(1)}</p>
-        <p className="mt-1 text-sm text-muted">{count} Google reviews</p>
+        <span className="mt-3 text-3xl font-normal">{rating.toFixed(1)}</span>
+        <span className="mt-1 text-sm text-muted">
+          {count} Google reviews
+        </span>
       </a>
       <div className="mt-6">
         <a href={url} target="_blank" rel="noreferrer" className="btn-outline">
