@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { EstimateForm } from "@/components/EstimateForm";
 import { GoogleReviews } from "@/components/GoogleReviews";
+import { PaymentMethods } from "@/components/PaymentMethods";
 import { testimonials } from "@/lib/testimonials";
 
 const firstQuotes = testimonials.slice(0, 6);
@@ -86,16 +87,11 @@ export default function HomePage() {
           <p>Saturday 8:00am - 3:00pm</p>
           <p>Sunday Closed</p>
         </div>
-        <Link href="/#estimate" className="btn mt-8">
-          Request Estimate
-        </Link>
       </section>
 
       <section className="mx-auto max-w-xl px-5 pb-8 text-center">
         <h2 className="text-2xl font-normal">Accepted Payment Methods</h2>
-        <p className="mt-3 text-sm tracking-[0.14em] uppercase text-muted">
-          Cash or Credit/Debit Card
-        </p>
+        <PaymentMethods />
       </section>
 
       <section id="about" className="mx-auto max-w-2xl px-5 pb-20 text-center">
@@ -123,13 +119,13 @@ function Quotes({
   quotes: { quote: string; name: string }[];
 }) {
   return (
-    <section className="mx-auto max-w-2xl space-y-12 px-5 py-8 text-center">
+    <section className="mx-auto max-w-3xl space-y-16 px-5 py-8 text-center">
       {quotes.map((item) => (
-        <blockquote key={item.name}>
-          <p className="text-[1.05rem] leading-7">&ldquo;{item.quote}&rdquo;</p>
-          <p className="mt-4 text-sm tracking-wide text-muted uppercase">
-            {item.name}
+        <blockquote key={item.name} className="font-[family-name:var(--font-lato)]">
+          <p className="text-[24px] leading-[1.65] font-normal text-[#222]">
+            &ldquo;{item.quote}&rdquo;
           </p>
+          <p className="mt-4 text-[15px] text-muted">{item.name}</p>
         </blockquote>
       ))}
     </section>
