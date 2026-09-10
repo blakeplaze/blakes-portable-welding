@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GoogleReviews } from "@/components/GoogleReviews";
 
 const links = [
   { href: "/#estimate", label: "Estimate Request Form" },
@@ -43,6 +44,9 @@ export function Footer() {
           ),
         )}
       </nav>
+      <div className="mb-8 flex justify-center">
+        <GoogleReviews compact />
+      </div>
       <div className="mb-8 flex justify-center gap-6">
         <a href="mailto:blakesportablewelding@gmail.com" className="hover:text-foreground">
           Email

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { EstimateForm } from "@/components/EstimateForm";
+import { GoogleReviews } from "@/components/GoogleReviews";
 import { testimonials } from "@/lib/testimonials";
 
 const firstQuotes = testimonials.slice(0, 6);
@@ -108,6 +109,8 @@ export default function HomePage() {
           practical, mobile solution to simple or complex repair needs.
         </p>
       </section>
+
+      <GoogleReviews />
 
       <EstimateForm id="estimate-bottom" />
     </div>
