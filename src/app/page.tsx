@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { EstimateForm } from "@/components/EstimateForm";
+import { WeldManagerForm } from "@/components/WeldManagerForm";
 import { GoogleReviews } from "@/components/GoogleReviews";
 import { PaymentMethods } from "@/components/PaymentMethods";
 import { testimonials } from "@/lib/testimonials";
@@ -20,7 +20,7 @@ export default function HomePage() {
         </h1>
       </section>
 
-      <EstimateForm />
+      <WeldManagerForm />
 
       <section className="mx-auto max-w-2xl px-5 py-16 text-center">
         <p className="text-sm tracking-[0.14em] uppercase text-muted">Our mission</p>
@@ -47,7 +47,7 @@ export default function HomePage() {
         </Link>
       </section>
 
-      <EstimateForm id="estimate-mid" />
+      <WeldManagerForm id="estimate-mid" />
       <Quotes quotes={laterQuotes} />
 
       <section className="mx-auto max-w-xl px-5 py-16 text-center">
@@ -108,7 +108,7 @@ export default function HomePage() {
 
       <GoogleReviews />
 
-      <EstimateForm id="estimate-bottom" />
+      <WeldManagerForm id="estimate-bottom" />
     </div>
   );
 }

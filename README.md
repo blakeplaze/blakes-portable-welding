@@ -13,7 +13,7 @@ npm run dev
 
 Open http://localhost:3000
 
-Estimate requests stay on the site and go to `blakesportablewelding@gmail.com` through FormSubmit. Text-only requests use AJAX. Requests with photos use a hidden form post so the pictures actually attach. The first live photo submit may ask that inbox to confirm email delivery once.
+Estimate requests stay on the site and go to Weld Manager. They create or update the customer, send an app notification, and email the shop. Optional photos are stored with the message.
 
 ## Spam protection
 
