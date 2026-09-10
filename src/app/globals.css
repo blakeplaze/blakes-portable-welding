@@ -63,6 +63,34 @@ textarea {
   opacity: 0.55;
 }
 
+.btn.btn-success,
+.btn.btn-success:hover,
+.btn.btn-success:disabled {
+  background: #17803d;
+  opacity: 1;
+  cursor: default;
+}
+
+.check-pop {
+  width: 1.2rem;
+  height: 1.2rem;
+  animation: check-pop 0.35s ease-out;
+}
+
+@keyframes check-pop {
+  0% {
+    transform: scale(0.35);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
 .btn-outline {
   display: inline-flex;
   align-items: center;

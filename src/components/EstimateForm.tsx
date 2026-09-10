@@ -182,10 +182,33 @@ export function EstimateForm({ id = "estimate" }: { id?: string }) {
         <Turnstile onToken={setTurnstileToken} />
         <button
           type="submit"
-          className="btn mt-2 w-full"
-          disabled={status === "sending" || (turnstileEnabled && !turnstileToken)}
+          className={`btn mt-2 w-full gap-2 ${status === "sent" ? "btn-success" : ""}`}
+          disabled={
+            status === "sending" ||
+            status === "sent" ||
+            (turnstileEnabled && !turnstileToken)
+          }
         >
-          {status === "sending" ? "Sending..." : "Submit"}
+          {status === "sent" ? (
+            <>
+              <svg className="check-pop" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" strokeWidth="2" />
+                <path
+                  d="M7 12.5l3.2 3.2L17 8.8"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              Sent
+            </>
+          ) : status === "sending" ? (
+            "Sending..."
+          ) : (
+            "Submit"
+          )}
         </button>
         {status === "sent" ? (
           <p className="text-center text-sm text-muted">
