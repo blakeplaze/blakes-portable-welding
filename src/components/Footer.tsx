@@ -68,6 +68,25 @@ export function Footer() {
         United States of America
         <br />© {new Date().getFullYear()}
       </p>
+      <div className="mt-8">
+        <a
+          href="https://myweldingbiz.com"
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2 text-[11px] tracking-wide text-muted hover:text-foreground"
+          aria-label="Powered by MyWeldingBiz"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/myweldingbiz-icon.png"
+            alt=""
+            width={28}
+            height={28}
+            className="h-7 w-7 rounded-[6px]"
+          />
+          Powered by MyWeldingBiz
+        </a>
+      </div>
     </footer>
   );
 }
