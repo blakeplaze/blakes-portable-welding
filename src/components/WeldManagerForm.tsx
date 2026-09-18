@@ -268,7 +268,8 @@ export function WeldManagerForm({ id = "estimate" }: { id?: string }) {
         {status === "sent" ? (
           <p className="text-center text-sm text-muted">
             Thanks — your estimate request was sent. We&apos;ll follow up at the
-            email you entered.
+            email you entered. If you don&apos;t see our reply, check your spam
+            or junk folder.
           </p>
         ) : null}
         {status === "error" ? (
