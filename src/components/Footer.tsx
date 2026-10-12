@@ -14,11 +14,7 @@ const links = [
     label: "The Welders Edge Blog",
     external: true,
   },
-  {
-    href: "https://www.weldwire.net/3783/welding-is-a-part-of-our-everyday-lives/",
-    label: "Why Welding Matters",
-    external: true,
-  },
+  { href: "/why-welding-matters", label: "Why Welding Matters" },
   { href: "/#about", label: "About Us" },
 ];
 
